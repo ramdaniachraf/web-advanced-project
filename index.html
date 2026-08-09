@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rick & Morty Explorer</title>
+  </head>
+  <body>
+    <header>
+      <h1>🛸 Rick & Morty Explorer</h1>
+      <button id="theme-toggle">🌙</button>
+
+      <input id="search-input" type="search" placeholder="Zoek een character op naam..." />
+
+      <select id="filter-status">
+        <option value="">Status: alle</option>
+        <option value="alive">Alive</option>
+        <option value="dead">Dead</option>
+        <option value="unknown">Unknown</option>
+      </select>
+
+      <select id="filter-species">
+        <option value="">Soort: alle</option>
+      </select>
+
+      <select id="sort-select">
+        <option value="name-asc">Naam A-Z</option>
+        <option value="name-desc">Naam Z-A</option>
+      </select>
+
+      <label>
+        <input type="checkbox" id="favorites-only" />
+        Alleen favorieten
+      </label>
+
+      <button id="view-grid">Kaarten</button>
+      <button id="view-table">Tabel</button>
+    </header>
+
+    <main id="app">
+      <p id="result-count"></p>
+      <div id="character-container"></div>
+      <div id="sentinel"></div>
+      <p id="loader" class="hidden">Laden...</p>
+      <p id="empty-state" class="hidden">Geen resultaten gevonden.</p>
+    </main>
+
+    <div id="modal-overlay" class="hidden">
+      <div id="modal">
+        <button id="modal-close">✕</button>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
