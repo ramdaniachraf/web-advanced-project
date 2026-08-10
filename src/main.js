@@ -6,6 +6,7 @@ const loader = document.querySelector('#loader');
 const searchInput = document.querySelector('#search-input');
 const statusFilter = document.querySelector('#filter-status');
 const speciesFilter = document.querySelector('#filter-species');
+const sortSelect = document.querySelector('#sort-select');
 
 let allCharacters = [];
 
@@ -34,6 +35,7 @@ function applyFilters() {
   const searchTerm = searchInput.value.toLowerCase();
   const status = statusFilter.value;
   const species = speciesFilter.value;
+  const sortOrder = sortSelect.value;
 
   const filtered = allCharacters.filter((character) => {
     const matchesSearch = character.name.toLowerCase().includes(searchTerm);
@@ -42,7 +44,11 @@ function applyFilters() {
     return matchesSearch && matchesStatus && matchesSpecies;
   });
 
-  renderCharacters(filtered);
+  const sorted = filtered.sort((a, b) =>
+    sortOrder === 'name-desc' ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name)
+  );
+
+  renderCharacters(sorted);
 }
 
 async function showCharacters() {
@@ -63,5 +69,6 @@ async function showCharacters() {
 searchInput.addEventListener('input', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
 speciesFilter.addEventListener('change', applyFilters);
+sortSelect.addEventListener('change', applyFilters);
 
 showCharacters();
