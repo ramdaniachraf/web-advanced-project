@@ -1,3 +1,5 @@
+'use strict';
+
 import './style.css';
 import { getCharacters } from './api.js';
 
@@ -10,28 +12,124 @@ const sortSelect = document.querySelector('#sort-select');
 const modalOverlay = document.querySelector('#modal-overlay');
 const modalContent = document.querySelector('#modal-content');
 const modalClose = document.querySelector('#modal-close');
+const viewGridBtn = document.querySelector('#view-grid');
+const viewTableBtn = document.querySelector('#view-table');
 
 let allCharacters = [];
+let currentView = 'grid';
+
+function renderGrid(characters) {
+  container.textContent = '';
+
+  for (const character of characters) {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const img = document.createElement('img');
+    img.src = character.image;
+    img.alt = character.name;
+
+    const title = document.createElement('h3');
+    title.textContent = character.name;
+
+    const info = document.createElement('p');
+    info.textContent = `${character.status} - ${character.species}`;
+
+    card.appendChild(img);
+    card.appendChild(title);
+    card.appendChild(info);
+
+    card.addEventListener('click', () => {
+      openModal(character);
+    });
+
+    container.appendChild(card);
+  }
+}
+
+function renderTable(characters) {
+  container.textContent = '';
+
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  const headerLabels = ['', 'Naam', 'Status', 'Soort', 'Gender', 'Origin', 'Locatie'];
+
+  for (const label of headerLabels) {
+    const th = document.createElement('th');
+    th.textContent = label;
+    headerRow.appendChild(th);
+  }
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+
+  for (const character of characters) {
+    const row = document.createElement('tr');
+
+    const imgCell = document.createElement('td');
+    const img = document.createElement('img');
+    img.src = character.image;
+    img.alt = character.name;
+    img.width = 40;
+    imgCell.appendChild(img);
+
+    const nameCell = document.createElement('td');
+    nameCell.textContent = character.name;
+
+    const statusCell = document.createElement('td');
+    statusCell.textContent = character.status;
+
+    const speciesCell = document.createElement('td');
+    speciesCell.textContent = character.species;
+
+    const genderCell = document.createElement('td');
+    genderCell.textContent = character.gender;
+
+    const originCell = document.createElement('td');
+    originCell.textContent = character.origin.name;
+
+    const locationCell = document.createElement('td');
+    locationCell.textContent = character.location.name;
+
+    row.appendChild(imgCell);
+    row.appendChild(nameCell);
+    row.appendChild(statusCell);
+    row.appendChild(speciesCell);
+    row.appendChild(genderCell);
+    row.appendChild(originCell);
+    row.appendChild(locationCell);
+
+    row.addEventListener('click', () => {
+      openModal(character);
+    });
+
+    tbody.appendChild(row);
+  }
+
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
 
 function renderCharacters(characters) {
-  container.innerHTML = characters
-    .map((character) => `
-      <div class="card" data-id="${character.id}">
-        <img src="${character.image}" alt="${character.name}">
-        <h3>${character.name}</h3>
-        <p>${character.status} - ${character.species}</p>
-      </div>
-    `)
-    .join('');
+  currentView === 'grid' ? renderGrid(characters) : renderTable(characters);
 }
 
 function fillSpeciesFilter() {
-  const allSpecies = allCharacters.map((character) => character.species);
-  const uniqueSpecies = [...new Set(allSpecies)];
-  const options = uniqueSpecies
-    .map((species) => `<option value="${species}">${species}</option>`)
-    .join('');
-  speciesFilter.innerHTML += options;
+  const uniqueSpecies = [];
+  for (const character of allCharacters) {
+    if (!uniqueSpecies.includes(character.species)) {
+      uniqueSpecies.push(character.species);
+    }
+  }
+
+  for (const species of uniqueSpecies) {
+    const option = document.createElement('option');
+    option.value = species;
+    option.textContent = species;
+    speciesFilter.appendChild(option);
+  }
 }
 
 function applyFilters() {
@@ -55,30 +153,51 @@ function applyFilters() {
 }
 
 function openModal(character) {
-  modalContent.innerHTML = `
-    <img src="${character.image}" alt="${character.name}" style="width: 150px;">
-    <h2>${character.name}</h2>
-    <p><strong>Status:</strong> ${character.status}</p>
-    <p><strong>Soort:</strong> ${character.species}</p>
-    <p><strong>Gender:</strong> ${character.gender}</p>
-    <p><strong>Origin:</strong> ${character.origin.name}</p>
-    <p><strong>Locatie:</strong> ${character.location.name}</p>
-  `;
-  modalOverlay.classList.remove('hidden');
+  modalContent.textContent = '';
+
+  const img = document.createElement('img');
+  img.src = character.image;
+  img.alt = character.name;
+  img.style.width = '150px';
+
+  const title = document.createElement('h2');
+  title.textContent = character.name;
+
+  const details = [
+    `Status: ${character.status}`,
+    `Soort: ${character.species}`,
+    `Gender: ${character.gender}`,
+    `Origin: ${character.origin.name}`,
+    `Locatie: ${character.location.name}`
+  ];
+
+  modalContent.appendChild(img);
+  modalContent.appendChild(title);
+
+  for (const detail of details) {
+    const p = document.createElement('p');
+    p.textContent = detail;
+    modalContent.appendChild(p);
+  }
+
+  modalOverlay.style.display = 'flex';
 }
 
 async function showCharacters() {
-  loader.classList.remove('hidden');
+  loader.style.display = 'block';
 
   try {
     allCharacters = await getCharacters();
     renderCharacters(allCharacters);
     fillSpeciesFilter();
   } catch (error) {
-    container.innerHTML = '<p>Er ging iets mis bij het ophalen van de characters.</p>';
+    container.textContent = '';
+    const errorMessage = document.createElement('p');
+    errorMessage.textContent = 'Er ging iets mis bij het ophalen van de characters.';
+    container.appendChild(errorMessage);
     console.error(error);
   } finally {
-    loader.classList.add('hidden');
+    loader.style.display = 'none';
   }
 }
 
@@ -87,16 +206,18 @@ statusFilter.addEventListener('change', applyFilters);
 speciesFilter.addEventListener('change', applyFilters);
 sortSelect.addEventListener('change', applyFilters);
 
-container.addEventListener('click', (event) => {
-  const card = event.target.closest('.card');
-  if (!card) return;
+viewGridBtn.addEventListener('click', () => {
+  currentView = 'grid';
+  applyFilters();
+});
 
-  const character = allCharacters.find((char) => char.id === Number(card.dataset.id));
-  openModal(character);
+viewTableBtn.addEventListener('click', () => {
+  currentView = 'table';
+  applyFilters();
 });
 
 modalClose.addEventListener('click', () => {
-  modalOverlay.classList.add('hidden');
+  modalOverlay.style.display = 'none';
 });
 
 showCharacters();
