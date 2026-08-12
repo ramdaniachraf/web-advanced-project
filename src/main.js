@@ -7,13 +7,16 @@ const searchInput = document.querySelector('#search-input');
 const statusFilter = document.querySelector('#filter-status');
 const speciesFilter = document.querySelector('#filter-species');
 const sortSelect = document.querySelector('#sort-select');
+const modalOverlay = document.querySelector('#modal-overlay');
+const modalContent = document.querySelector('#modal-content');
+const modalClose = document.querySelector('#modal-close');
 
 let allCharacters = [];
 
 function renderCharacters(characters) {
   container.innerHTML = characters
     .map((character) => `
-      <div class="card">
+      <div class="card" data-id="${character.id}">
         <img src="${character.image}" alt="${character.name}">
         <h3>${character.name}</h3>
         <p>${character.status} - ${character.species}</p>
@@ -51,6 +54,19 @@ function applyFilters() {
   renderCharacters(sorted);
 }
 
+function openModal(character) {
+  modalContent.innerHTML = `
+    <img src="${character.image}" alt="${character.name}" style="width: 150px;">
+    <h2>${character.name}</h2>
+    <p><strong>Status:</strong> ${character.status}</p>
+    <p><strong>Soort:</strong> ${character.species}</p>
+    <p><strong>Gender:</strong> ${character.gender}</p>
+    <p><strong>Origin:</strong> ${character.origin.name}</p>
+    <p><strong>Locatie:</strong> ${character.location.name}</p>
+  `;
+  modalOverlay.classList.remove('hidden');
+}
+
 async function showCharacters() {
   loader.classList.remove('hidden');
 
@@ -70,5 +86,17 @@ searchInput.addEventListener('input', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
 speciesFilter.addEventListener('change', applyFilters);
 sortSelect.addEventListener('change', applyFilters);
+
+container.addEventListener('click', (event) => {
+  const card = event.target.closest('.card');
+  if (!card) return;
+
+  const character = allCharacters.find((char) => char.id === Number(card.dataset.id));
+  openModal(character);
+});
+
+modalClose.addEventListener('click', () => {
+  modalOverlay.classList.add('hidden');
+});
 
 showCharacters();
