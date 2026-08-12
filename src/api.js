@@ -1,3 +1,5 @@
+'use strict';
+
 const API_URL = "https://rickandmortyapi.com/api/character";
 
 export async function getCharacters() {
