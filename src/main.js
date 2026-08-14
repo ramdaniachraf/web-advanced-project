@@ -17,7 +17,7 @@ const viewTableBtn = document.querySelector('#view-table');
 
 let allCharacters = [];
 let currentView = 'grid';
-let favorites = [];
+let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
 function toggleFavorite(id) {
   if (favorites.includes(id)) {
@@ -25,6 +25,7 @@ function toggleFavorite(id) {
   } else {
     favorites.push(id);
   }
+  localStorage.setItem('favorites', JSON.stringify(favorites));
   applyFilters();
 }
 
