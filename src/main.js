@@ -221,6 +221,31 @@ function openModal(character) {
     modalContent.appendChild(p);
   }
 
+  const noteLabel = document.createElement('label');
+  noteLabel.textContent = 'Persoonlijke notitie:';
+
+  const noteInput = document.createElement('input');
+  noteInput.type = 'text';
+  noteInput.value = localStorage.getItem(`note-${character.id}`) || '';
+
+  const noteFeedback = document.createElement('p');
+
+  const noteButton = document.createElement('button');
+  noteButton.textContent = 'Bewaar notitie';
+  noteButton.addEventListener('click', () => {
+    if (noteInput.value.trim() === '') {
+      noteFeedback.textContent = 'Vul eerst een notitie in voor je opslaat.';
+    } else {
+      localStorage.setItem(`note-${character.id}`, noteInput.value);
+      noteFeedback.textContent = 'Notitie opgeslagen!';
+    }
+  });
+
+  modalContent.appendChild(noteLabel);
+  modalContent.appendChild(noteInput);
+  modalContent.appendChild(noteButton);
+  modalContent.appendChild(noteFeedback);
+
   modalOverlay.style.display = 'flex';
 }
 
