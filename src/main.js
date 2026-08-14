@@ -17,6 +17,16 @@ const viewTableBtn = document.querySelector('#view-table');
 
 let allCharacters = [];
 let currentView = 'grid';
+let favorites = [];
+
+function toggleFavorite(id) {
+  if (favorites.includes(id)) {
+    favorites = favorites.filter((favId) => favId !== id);
+  } else {
+    favorites.push(id);
+  }
+  applyFilters();
+}
 
 function renderGrid(characters) {
   container.textContent = '';
@@ -28,20 +38,23 @@ function renderGrid(characters) {
     const img = document.createElement('img');
     img.src = character.image;
     img.alt = character.name;
+    img.addEventListener('click', () => openModal(character));
 
     const title = document.createElement('h3');
     title.textContent = character.name;
+    title.addEventListener('click', () => openModal(character));
 
     const info = document.createElement('p');
     info.textContent = `${character.status} - ${character.species}`;
 
+    const favoriteBtn = document.createElement('button');
+    favoriteBtn.textContent = favorites.includes(character.id) ? '❤️' : '🤍';
+    favoriteBtn.addEventListener('click', () => toggleFavorite(character.id));
+
     card.appendChild(img);
     card.appendChild(title);
     card.appendChild(info);
-
-    card.addEventListener('click', () => {
-      openModal(character);
-    });
+    card.appendChild(favoriteBtn);
 
     container.appendChild(card);
   }
@@ -53,7 +66,7 @@ function renderTable(characters) {
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  const headerLabels = ['', 'Naam', 'Status', 'Soort', 'Gender', 'Origin', 'Locatie'];
+  const headerLabels = ['', 'Naam', 'Status', 'Soort', 'Gender', 'Origin', 'Locatie', 'Favoriet'];
 
   for (const label of headerLabels) {
     const th = document.createElement('th');
@@ -73,10 +86,12 @@ function renderTable(characters) {
     img.src = character.image;
     img.alt = character.name;
     img.width = 40;
+    img.addEventListener('click', () => openModal(character));
     imgCell.appendChild(img);
 
     const nameCell = document.createElement('td');
     nameCell.textContent = character.name;
+    nameCell.addEventListener('click', () => openModal(character));
 
     const statusCell = document.createElement('td');
     statusCell.textContent = character.status;
@@ -93,6 +108,12 @@ function renderTable(characters) {
     const locationCell = document.createElement('td');
     locationCell.textContent = character.location.name;
 
+    const favoriteCell = document.createElement('td');
+    const favoriteBtn = document.createElement('button');
+    favoriteBtn.textContent = favorites.includes(character.id) ? '❤️' : '🤍';
+    favoriteBtn.addEventListener('click', () => toggleFavorite(character.id));
+    favoriteCell.appendChild(favoriteBtn);
+
     row.appendChild(imgCell);
     row.appendChild(nameCell);
     row.appendChild(statusCell);
@@ -100,10 +121,7 @@ function renderTable(characters) {
     row.appendChild(genderCell);
     row.appendChild(originCell);
     row.appendChild(locationCell);
-
-    row.addEventListener('click', () => {
-      openModal(character);
-    });
+    row.appendChild(favoriteCell);
 
     tbody.appendChild(row);
   }
