@@ -14,10 +14,32 @@ const modalContent = document.querySelector('#modal-content');
 const modalClose = document.querySelector('#modal-close');
 const viewGridBtn = document.querySelector('#view-grid');
 const viewTableBtn = document.querySelector('#view-table');
+const themeToggle = document.querySelector('#theme-toggle');
 
 let allCharacters = [];
 let currentView = 'grid';
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+let isDarkTheme = localStorage.getItem('theme') === 'dark';
+
+function applyTheme() {
+  if (isDarkTheme) {
+    document.body.style.backgroundColor = '#222';
+    document.body.style.color = '#fff';
+    themeToggle.textContent = '☀️';
+  } else {
+    document.body.style.backgroundColor = '#f4f4f4';
+    document.body.style.color = '#222';
+    themeToggle.textContent = '🌙';
+  }
+}
+
+themeToggle.addEventListener('click', () => {
+  isDarkTheme = !isDarkTheme;
+  localStorage.setItem('theme', isDarkTheme ? 'dark' : 'light');
+  applyTheme();
+});
+
+applyTheme();
 
 function toggleFavorite(id) {
   if (favorites.includes(id)) {
