@@ -40,11 +40,36 @@ header h1 {
   padding: 1rem;
   width: 200px;
   text-align: center;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
 }
 
 .card img {
   width: 100%;
   border-radius: 4px;
+}
+
+@keyframes heartPop {
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+.card button:active {
+  animation: heartPop 0.2s;
+}
+
+@media (max-width: 480px) {
+  #search-input {
+    width: 100%;
+  }
+
+  .card {
+    width: 100%;
+  }
 }
 
 #modal-overlay {
