@@ -15,11 +15,15 @@ const modalClose = document.querySelector('#modal-close');
 const viewGridBtn = document.querySelector('#view-grid');
 const viewTableBtn = document.querySelector('#view-table');
 const themeToggle = document.querySelector('#theme-toggle');
+const sentinel = document.querySelector('#sentinel');
 
 let allCharacters = [];
 let currentView = 'grid';
 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 let isDarkTheme = localStorage.getItem('theme') === 'dark';
+let currentPage = 1;
+let hasNextPage = true;
+let isLoading = false;
 
 function applyTheme() {
   if (isDarkTheme) {
@@ -165,11 +169,18 @@ function fillSpeciesFilter() {
     }
   }
 
+  const existingValues = [];
+  for (const option of speciesFilter.options) {
+    existingValues.push(option.value);
+  }
+
   for (const species of uniqueSpecies) {
-    const option = document.createElement('option');
-    option.value = species;
-    option.textContent = species;
-    speciesFilter.appendChild(option);
+    if (!existingValues.includes(species)) {
+      const option = document.createElement('option');
+      option.value = species;
+      option.textContent = species;
+      speciesFilter.appendChild(option);
+    }
   }
 }
 
@@ -253,7 +264,9 @@ async function showCharacters() {
   loader.style.display = 'block';
 
   try {
-    allCharacters = await getCharacters();
+    const data = await getCharacters(currentPage);
+    allCharacters = data.results;
+    hasNextPage = data.info.next !== null;
     renderCharacters(allCharacters);
     fillSpeciesFilter();
   } catch (error) {
@@ -266,6 +279,38 @@ async function showCharacters() {
     loader.style.display = 'none';
   }
 }
+
+async function loadMoreCharacters() {
+  if (isLoading || !hasNextPage) return;
+  isLoading = true;
+  loader.style.display = 'block';
+
+  try {
+    currentPage = currentPage + 1;
+    const data = await getCharacters(currentPage);
+    for (const character of data.results) {
+      allCharacters.push(character);
+    }
+    hasNextPage = data.info.next !== null;
+    fillSpeciesFilter();
+    applyFilters();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isLoading = false;
+    loader.style.display = 'none';
+  }
+}
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      loadMoreCharacters();
+    }
+  });
+});
+
+observer.observe(sentinel);
 
 searchInput.addEventListener('input', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
