@@ -25,6 +25,7 @@ Interactieve Single Page Application voor het vak **Web Advanced**. Een SPA waar
 - Filters op status en soort (soort-lijst wordt dynamisch opgebouwd uit de opgehaalde data)
 - Sorteren op naam (A-Z / Z-A)
 - Alles hierboven werkt **gecombineerd**: zoeken, filteren, sorteren en de "alleen favorieten"-schakelaar tellen allemaal tegelijk mee
+- Eén klik om alle filters (zoekterm, status, soort, sortering, favorieten) terug te zetten naar hun standaardwaarde
 - Automatisch bijladen van meer personages bij het scrollen (infinite scroll)
 
 **Personalisatie**
@@ -109,57 +110,57 @@ web-advanced-project/
 
 | Concept | Bestand + lijn |
 |---|---|
-| Elementen selecteren (`querySelector`) | [main.js:8-23](src/main.js#L8-L23) |
-| Elementen manipuleren (`createElement`, `textContent`, `appendChild`) | [main.js:75-105](src/main.js#L75-L105) (renderGrid), [main.js:111-179](src/main.js#L111-L179) (renderTable), [main.js:258-315](src/main.js#L258-L315) (openModal) |
-| Elementen manipuleren (`.style.property`) | [main.js:39-45](src/main.js#L39-L45) (thema), [main.js:243-247](src/main.js#L243-L247) (lege-staat), [main.js:314](src/main.js#L314) (modal tonen) |
-| Events koppelen (`addEventListener`) | [main.js:85, 89, 96](src/main.js#L85) (per kaart-element), [main.js:381-397](src/main.js#L381-L397) (filters/knoppen) |
+| Elementen selecteren (`querySelector`) | [main.js:8-26](src/main.js#L8-L26) |
+| Elementen manipuleren (`createElement`, `textContent`, `appendChild`) | [main.js:85-122](src/main.js#L85-L122) (renderGrid), [main.js:128-204](src/main.js#L128-L204) (renderTable), [main.js:283-340](src/main.js#L283-L340) (openModal) |
+| Elementen manipuleren (`.style.property`) | [main.js:40-57](src/main.js#L40-L57) (thema), [main.js:267-273](src/main.js#L267-L273) (lege-staat), [main.js:339](src/main.js#L339) (modal tonen) |
+| Events koppelen (`addEventListener`) | [main.js:102, 106, 113](src/main.js#L102) (per kaart-element), [main.js:406-433](src/main.js#L406-L433) (filters/knoppen, incl. reset) |
 
 ### Modern JavaScript
 
 | Concept | Bestand + lijn |
 |---|---|
-| Constanten (`const`) | Overal, bv. [api.js:4](src/api.js#L4), [main.js:8-23](src/main.js#L8-L23) |
-| Template literals | [api.js:10, 16](src/api.js#L10), [main.js:92, 269-274](src/main.js#L269-L274) |
-| Iteratie over arrays (`for...of`) | [main.js:78](src/main.js#L78) (renderGrid), [main.js:129](src/main.js#L129) (renderTable), [main.js:192, 199, 203](src/main.js#L192-L203) (fillSpeciesFilter) |
-| Array methodes (`filter`, `sort`, `includes`, `push`) | [main.js:224-233](src/main.js#L224-L233) (filter), [main.js:235-237](src/main.js#L235-L237) (sort), [main.js:62-68](src/main.js#L62-L68) (includes + push) |
-| Arrow functions | Overal, bv. [main.js:49-53](src/main.js#L49-L53), [main.js:224-233](src/main.js#L224-L233) |
-| Ternary operator | [main.js:95](src/main.js#L95) (hartje-icoon), [main.js:183](src/main.js#L183) (grid/tabel kiezen), [main.js:236](src/main.js#L236) (sorteervolgorde), [main.js:51](src/main.js#L51) (thema opslaan) |
-| Callback functions | Event listener-callbacks overal, `.filter()`/`.sort()`-callbacks ([main.js:224, 235](src/main.js#L224)), `entries.forEach`-callback ([main.js:371](src/main.js#L371)) |
+| Constanten (`const`) | Overal, bv. [api.js:4](src/api.js#L4), [main.js:8-26](src/main.js#L8-L26) |
+| Template literals | [api.js:10, 16](src/api.js#L10), [main.js:109, 294-300](src/main.js#L294-L300) |
+| Iteratie over arrays (`for...of`) | [main.js:88](src/main.js#L88) (renderGrid), [main.js:154](src/main.js#L154) (renderTable), [main.js:217, 224, 228](src/main.js#L217-L228) (fillSpeciesFilter) |
+| Array methodes (`filter`, `sort`, `includes`, `push`) | [main.js:249-258](src/main.js#L249-L258) (filter), [main.js:260-262](src/main.js#L260-L262) (sort), [main.js:72-78](src/main.js#L72-L78) (includes + push) |
+| Arrow functions | Overal, bv. [main.js:59-63](src/main.js#L59-L63), [main.js:249-258](src/main.js#L249-L258) |
+| Ternary operator | [main.js:112](src/main.js#L112) (hartje-icoon), [main.js:208](src/main.js#L208) (grid/tabel kiezen), [main.js:261](src/main.js#L261) (sorteervolgorde), [main.js:61](src/main.js#L61) (thema opslaan) |
+| Callback functions | Event listener-callbacks overal, `.filter()`/`.sort()`-callbacks ([main.js:249, 260](src/main.js#L249)), `entries.forEach`-callback ([main.js:396](src/main.js#L396)) |
 | Promises | `fetch()` geeft een Promise terug ([api.js:10](src/api.js#L10)) |
-| Async & Await | [api.js:9](src/api.js#L9) (`getCharacters`), [main.js:319](src/main.js#L319) (`showCharacters`), [main.js:343](src/main.js#L343) (`loadMoreCharacters`) |
-| Observer API | [main.js:370-378](src/main.js#L370-L378) (`IntersectionObserver` voor infinite scroll) |
+| Async & Await | [api.js:9](src/api.js#L9) (`getCharacters`), [main.js:344](src/main.js#L344) (`showCharacters`), [main.js:368](src/main.js#L368) (`loadMoreCharacters`) |
+| Observer API | [main.js:395-403](src/main.js#L395-L403) (`IntersectionObserver` voor infinite scroll) |
 
 ### Data & API
 
 | Concept | Bestand + lijn |
 |---|---|
 | Fetch | [api.js:10](src/api.js#L10) |
-| JSON manipuleren en weergeven | [api.js:19](src/api.js#L19) (`response.json()`), [main.js:28, 67](src/main.js#L28) (`JSON.parse`/`JSON.stringify` voor favorieten in LocalStorage) |
+| JSON manipuleren en weergeven | [api.js:19](src/api.js#L19) (`response.json()`), [main.js:31, 77](src/main.js#L31) (`JSON.parse`/`JSON.stringify` voor favorieten in LocalStorage) |
 
 ### Opslag & validatie
 
 | Concept | Bestand + lijn |
 |---|---|
-| Formuliervalidatie | [main.js:299-307](src/main.js#L299-L307) (notitie: lege input geeft foutmelding, geldige input een bevestiging) |
-| LocalStorage | [main.js:28-29](src/main.js#L28-L29) (laden), [main.js:51, 67, 304](src/main.js#L51) (opslaan: thema, favorieten, notities) |
+| Formuliervalidatie | [main.js:324-332](src/main.js#L324-L332) (notitie: lege input geeft foutmelding, geldige input een bevestiging) |
+| LocalStorage | [main.js:31-32](src/main.js#L31-L32) (laden), [main.js:61, 77, 329](src/main.js#L61) (opslaan: thema, favorieten, notities) |
 
 ### Styling & layout
 
 | Concept | Bestand + lijn |
 |---|---|
-| Flexbox | [style.css:9](src/style.css#L9) (header), [style.css:31](src/style.css#L31) (character-container) |
+| Flexbox | [style.css:14](src/style.css#L14) (header), [style.css:89](src/style.css#L89) (character-container) |
 | Basis CSS | [style.css](src/style.css) (volledig bestand) |
-| Responsive design | [style.css:65-73](src/style.css#L65-L73) (`@media (max-width: 480px)`) |
-| Animaties | [style.css:46-48](src/style.css#L46-L48) (kaart-hover), [style.css:55-63](src/style.css#L55-L63) (hartje-pop) |
-| Gebruiksvriendelijke elementen | Hartje-knop ([main.js:94-96](src/main.js#L94-L96)), sluitknop modal ([index.html:51](index.html#L51)), view-toggle- en thema-knoppen ([index.html:12, 37-38](index.html#L12)) |
+| Responsive design | [style.css:184-196](src/style.css#L184-L196) (`@media (max-width: 480px)`) |
+| Animaties | [style.css:105-108](src/style.css#L105-L108) (kaart-hover), [style.css:135-143](src/style.css#L135-L143) (hartje-pop) |
+| Gebruiksvriendelijke elementen | Hartje-knop ([main.js:111-113](src/main.js#L111-L113)), sluitknop modal ([index.html:53](index.html#L53)), reset-filters-knop ([index.html:37](index.html#L37)), view-toggle- en thema-knoppen ([index.html:12, 39-40](index.html#L12)) |
 
 ### Asynchroon Web Dev
 
-`async`/`await` wordt consequent gebruikt voor elke API-call: [api.js:9](src/api.js#L9) (`getCharacters`), [main.js:319](src/main.js#L319) (`showCharacters`, eerste keer laden), [main.js:343](src/main.js#L343) (`loadMoreCharacters`, infinite scroll). Foutafhandeling via `try/catch/finally` op alle drie de plekken.
+`async`/`await` wordt consequent gebruikt voor elke API-call: [api.js:9](src/api.js#L9) (`getCharacters`), [main.js:344](src/main.js#L344) (`showCharacters`, eerste keer laden), [main.js:368](src/main.js#L368) (`loadMoreCharacters`, infinite scroll). Foutafhandeling via `try/catch/finally` op alle drie de plekken.
 
 ### Fetch en datamanipulatie
 
-`api.js` haalt data op en geeft het **volledige** API-antwoord terug (`data.results` + `data.info.next`), zodat `main.js` zowel de personages als de paginering-informatie kan gebruiken ([api.js:9-25](src/api.js#L9-L25)). Favorieten worden apart bijgehouden als een eigen array van ID's ([main.js:28](src/main.js#L28)), losstaand van de ruwe API-data.
+`api.js` haalt data op en geeft het **volledige** API-antwoord terug (`data.results` + `data.info.next`), zodat `main.js` zowel de personages als de paginering-informatie kan gebruiken ([api.js:9-25](src/api.js#L9-L25)). Favorieten worden apart bijgehouden als een eigen array van ID's ([main.js:29](src/main.js#L29)), losstaand van de ruwe API-data.
 
 ### Tooling & structuur
 
