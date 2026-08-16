@@ -398,7 +398,7 @@ const observer = new IntersectionObserver((entries) => {
       loadMoreCharacters();
     }
   });
-});
+}, { rootMargin: '300px' });
 
 observer.observe(sentinel);
 
