@@ -21,6 +21,8 @@ const sentinel = document.querySelector('#sentinel');
 const resultCount = document.querySelector('#result-count');
 const favoritesOnlyCheckbox = document.querySelector('#favorites-only');
 const emptyState = document.querySelector('#empty-state');
+const headerEl = document.querySelector('header');
+const modalBox = document.querySelector('#modal');
 
 // ===== Applicatie-state =====
 let allCharacters = [];        // alle characters die tot nu toe opgehaald zijn
@@ -38,12 +40,19 @@ function applyTheme() {
   if (isDarkTheme) {
     document.body.style.backgroundColor = '#222';
     document.body.style.color = '#fff';
+    headerEl.style.backgroundColor = '#333';
+    modalBox.style.backgroundColor = '#333';
+    modalBox.style.color = '#fff';
     themeToggle.textContent = '☀️';
   } else {
     document.body.style.backgroundColor = '#f4f4f4';
     document.body.style.color = '#222';
+    headerEl.style.backgroundColor = '#ffffff';
+    modalBox.style.backgroundColor = '#ffffff';
+    modalBox.style.color = '#222';
     themeToggle.textContent = '🌙';
   }
+  applyFilters(); // herrendert kaarten/tabel zodat hun kleur meteen mee verandert
 }
 
 themeToggle.addEventListener('click', () => {
@@ -78,6 +87,13 @@ function renderGrid(characters) {
   for (const character of characters) {
     const card = document.createElement('div');
     card.className = 'card';
+    if (isDarkTheme) {
+      card.style.backgroundColor = '#333';
+      card.style.color = '#fff';
+    } else {
+      card.style.backgroundColor = '#fff';
+      card.style.color = '#222';
+    }
 
     const img = document.createElement('img');
     img.src = character.image;
@@ -112,6 +128,14 @@ function renderTable(characters) {
   container.textContent = '';
 
   const table = document.createElement('table');
+  if (isDarkTheme) {
+    table.style.backgroundColor = '#333';
+    table.style.color = '#fff';
+  } else {
+    table.style.backgroundColor = '#fff';
+    table.style.color = '#222';
+  }
+
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
   const headerLabels = ['', 'Naam', 'Status', 'Soort', 'Gender', 'Origin', 'Locatie', 'Favoriet'];
