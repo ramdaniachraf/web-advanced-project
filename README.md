@@ -50,21 +50,11 @@ Documentatie: https://rickandmortyapi.com/documentation
 
 ## Screenshots
 
-> Zelf toe te voegen: `npm run dev`, en screenshots opslaan in een map `screenshots/` in de project-root.
->
-> - `screenshots/grid-view.png` — kaartweergave
-> - `screenshots/table-view.png` — tabelweergave
-> - `screenshots/modal.png` — detail-modal met notitieveld
-> - `screenshots/dark-theme.png` — dark thema
-> - `screenshots/mobile.png` — mobiele weergave
->
-> ```markdown
-> ![Kaartweergave](screenshots/grid-view.png)
-> ![Tabelweergave](screenshots/table-view.png)
-> ![Detail-modal](screenshots/modal.png)
-> ![Dark thema](screenshots/dark-theme.png)
-> ![Mobiel](screenshots/mobile.png)
-> ```
+![Kaartweergave](screenshots/grid-view.png)
+![Tabelweergave](screenshots/table-view.png)
+![Detail-modal](screenshots/modal.png)
+![Dark thema](screenshots/dark-theme.png)
+![Mobiel](screenshots/mobile.png)
 
 ## Installatiehandleiding
 
