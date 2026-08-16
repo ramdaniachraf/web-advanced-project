@@ -3,6 +3,8 @@
 import './style.css';
 import { getCharacters } from './api.js';
 
+// ===== DOM-selectie =====
+// Alle elementen die we nodig hebben, één keer opzoeken bij het opstarten.
 const container = document.querySelector('#character-container');
 const loader = document.querySelector('#loader');
 const searchInput = document.querySelector('#search-input');
@@ -20,14 +22,18 @@ const resultCount = document.querySelector('#result-count');
 const favoritesOnlyCheckbox = document.querySelector('#favorites-only');
 const emptyState = document.querySelector('#empty-state');
 
-let allCharacters = [];
-let currentView = 'grid';
-let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+// ===== Applicatie-state =====
+let allCharacters = [];        // alle characters die tot nu toe opgehaald zijn
+let currentView = 'grid';      // 'grid' of 'table'
+let favorites = JSON.parse(localStorage.getItem('favorites')) || [];  // lijst van favoriete character-ID's
 let isDarkTheme = localStorage.getItem('theme') === 'dark';
-let currentPage = 1;
-let hasNextPage = true;
-let isLoading = false;
+let currentPage = 1;           // huidige API-pagina
+let hasNextPage = true;        // is er nog een volgende pagina om te laden?
+let isLoading = false;         // voorkomt dubbele/overlappende fetches tijdens infinite scroll
 
+// ===== Thema-switcher =====
+// Past de kleuren van de pagina aan op basis van isDarkTheme, en wisselt
+// het icoon van de knop (🌙 = klik om donker te worden, ☀️ = klik voor licht).
 function applyTheme() {
   if (isDarkTheme) {
     document.body.style.backgroundColor = '#222';
@@ -46,8 +52,12 @@ themeToggle.addEventListener('click', () => {
   applyTheme();
 });
 
+// Thema meteen toepassen bij het opstarten (haalt de vorige keuze uit LocalStorage).
 applyTheme();
 
+// ===== Favorieten =====
+// Voegt een character-ID toe aan de favorieten, of verwijdert het als het
+// er al in stond. Slaat het resultaat meteen op in LocalStorage.
 function toggleFavorite(id) {
   if (favorites.includes(id)) {
     favorites = favorites.filter((favId) => favId !== id);
@@ -55,11 +65,15 @@ function toggleFavorite(id) {
     favorites.push(id);
   }
   localStorage.setItem('favorites', JSON.stringify(favorites));
-  applyFilters();
+  applyFilters(); // herrenderen zodat het hartje-icoon meteen bijwerkt
 }
 
+// ===== Kaartweergave =====
+// Bouwt voor elk character een kaartje op met foto, naam, status/soort
+// en een favorieten-knop. Foto en titel openen de modal; het hartje heeft
+// een eigen, aparte klik-listener zodat die niet ook de modal opent.
 function renderGrid(characters) {
-  container.textContent = '';
+  container.textContent = ''; // vorige inhoud wissen
 
   for (const character of characters) {
     const card = document.createElement('div');
@@ -90,6 +104,10 @@ function renderGrid(characters) {
   }
 }
 
+// ===== Tabelweergave =====
+// Bouwt een tabel op met 8 kolommen (incl. favorieten-kolom). Zelfde
+// principe als renderGrid: foto/naam-cel openen de modal, het hartje
+// heeft zijn eigen listener.
 function renderTable(characters) {
   container.textContent = '';
 
@@ -160,10 +178,15 @@ function renderTable(characters) {
   container.appendChild(table);
 }
 
+// Kiest welke render-functie er gebruikt wordt, afhankelijk van de huidige weergave.
 function renderCharacters(characters) {
   currentView === 'grid' ? renderGrid(characters) : renderTable(characters);
 }
 
+// Vult de soort-dropdown dynamisch met alle unieke soorten uit de opgehaalde
+// data. Kan meermaals aangeroepen worden (bv. na het bijladen van een nieuwe
+// pagina) zonder dubbele opties te maken: we checken eerst welke waarden er
+// al als optie staan.
 function fillSpeciesFilter() {
   const uniqueSpecies = [];
   for (const character of allCharacters) {
@@ -187,6 +210,10 @@ function fillSpeciesFilter() {
   }
 }
 
+// ===== Filteren, sorteren en renderen =====
+// Combineert zoekterm, status-filter, soort-filter, "alleen favorieten" en
+// sortering in één functiepad, zodat ze altijd samen toegepast worden.
+// Werkt ook de resultaattelling en de lege-staat-melding bij.
 function applyFilters() {
   const searchTerm = searchInput.value.toLowerCase();
   const status = statusFilter.value;
@@ -198,6 +225,9 @@ function applyFilters() {
     const matchesSearch = character.name.toLowerCase().includes(searchTerm);
     const matchesStatus = status === '' || character.status.toLowerCase() === status;
     const matchesSpecies = species === '' || character.species === species;
+    // Als het vinkje niet aangevinkt is, telt deze voorwaarde altijd als waar
+    // (geen filter actief). Is het wél aangevinkt, dan moet het character ook
+    // echt in de favorieten-lijst staan.
     const matchesFavorite = !onlyFavorites || favorites.includes(character.id);
     return matchesSearch && matchesStatus && matchesSpecies && matchesFavorite;
   });
@@ -208,6 +238,7 @@ function applyFilters() {
 
   resultCount.textContent = `${sorted.length} resultaten`;
 
+  // Lege-staat tonen/verbergen op basis van het aantal resultaten.
   if (sorted.length === 0) {
     emptyState.style.display = 'block';
     container.style.display = 'none';
@@ -219,6 +250,11 @@ function applyFilters() {
   renderCharacters(sorted);
 }
 
+// ===== Detail-modal =====
+// Bouwt de volledige inhoud van de modal op (foto, details, notitieveld)
+// en toont die. Wordt telkens volledig herbouwd (modalContent.textContent
+// = ''), dus er blijft nooit een oude foutmelding of notitie van een ander
+// character hangen.
 function openModal(character) {
   modalContent.textContent = '';
 
@@ -247,6 +283,8 @@ function openModal(character) {
     modalContent.appendChild(p);
   }
 
+  // Notitieveld: bestaande notitie (indien aanwezig) wordt vooringevuld
+  // vanuit LocalStorage, met een unieke sleutel per character.
   const noteLabel = document.createElement('label');
   noteLabel.textContent = 'Persoonlijke notitie:';
 
@@ -259,6 +297,7 @@ function openModal(character) {
   const noteButton = document.createElement('button');
   noteButton.textContent = 'Bewaar notitie';
   noteButton.addEventListener('click', () => {
+    // Validatie: een lege of enkel-spaties notitie wordt niet opgeslagen.
     if (noteInput.value.trim() === '') {
       noteFeedback.textContent = 'Vul eerst een notitie in voor je opslaat.';
     } else {
@@ -275,6 +314,8 @@ function openModal(character) {
   modalOverlay.style.display = 'flex';
 }
 
+// ===== Data ophalen =====
+// Haalt de eerste pagina op bij het opstarten van de app.
 async function showCharacters() {
   loader.style.display = 'block';
 
@@ -283,8 +324,9 @@ async function showCharacters() {
     allCharacters = data.results;
     hasNextPage = data.info.next !== null;
     fillSpeciesFilter();
-    applyFilters();
+    applyFilters(); // rendert meteen ook de resultaattelling/lege-staat correct
   } catch (error) {
+    // Nette foutmelding i.p.v. de app te laten crashen.
     container.textContent = '';
     const errorMessage = document.createElement('p');
     errorMessage.textContent = 'Er ging iets mis bij het ophalen van de characters.';
@@ -295,6 +337,9 @@ async function showCharacters() {
   }
 }
 
+// Haalt de volgende pagina op (aangeroepen door de IntersectionObserver
+// hieronder). isLoading voorkomt dat er een tweede fetch start terwijl de
+// eerste nog bezig is (bv. bij snel scrollen).
 async function loadMoreCharacters() {
   if (isLoading || !hasNextPage) return;
   isLoading = true;
@@ -307,7 +352,7 @@ async function loadMoreCharacters() {
       allCharacters.push(character);
     }
     hasNextPage = data.info.next !== null;
-    fillSpeciesFilter();
+    fillSpeciesFilter(); // kan nieuwe soorten bevatten die nog niet in de dropdown stonden
     applyFilters();
   } catch (error) {
     console.error(error);
@@ -317,6 +362,11 @@ async function loadMoreCharacters() {
   }
 }
 
+// ===== Observer API: infinite scroll =====
+// Houdt het onzichtbare #sentinel-element (onderaan de lijst) in de gaten.
+// Zodra dat in beeld komt, wordt automatisch de volgende pagina geladen.
+// We roepen hier bewust geen observer.unobserve() aan: we willen dat dit
+// blijft triggeren bij elke nieuwe scroll, niet maar één keer.
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -327,6 +377,7 @@ const observer = new IntersectionObserver((entries) => {
 
 observer.observe(sentinel);
 
+// ===== Event listeners voor filters/weergave =====
 searchInput.addEventListener('input', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
 speciesFilter.addEventListener('change', applyFilters);
@@ -347,4 +398,5 @@ modalClose.addEventListener('click', () => {
   modalOverlay.style.display = 'none';
 });
 
+// App opstarten.
 showCharacters();
