@@ -21,6 +21,7 @@ const sentinel = document.querySelector('#sentinel');
 const resultCount = document.querySelector('#result-count');
 const favoritesOnlyCheckbox = document.querySelector('#favorites-only');
 const emptyState = document.querySelector('#empty-state');
+const resetFiltersBtn = document.querySelector('#reset-filters');
 const headerEl = document.querySelector('header');
 const modalBox = document.querySelector('#modal');
 
@@ -407,6 +408,15 @@ statusFilter.addEventListener('change', applyFilters);
 speciesFilter.addEventListener('change', applyFilters);
 sortSelect.addEventListener('change', applyFilters);
 favoritesOnlyCheckbox.addEventListener('change', applyFilters);
+
+resetFiltersBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  statusFilter.value = '';
+  speciesFilter.value = '';
+  sortSelect.value = 'name-asc';
+  favoritesOnlyCheckbox.checked = false;
+  applyFilters();
+});
 
 viewGridBtn.addEventListener('click', () => {
   currentView = 'grid';
