@@ -167,6 +167,7 @@ web-advanced-project/
 - AI-assistentie: zie [AI-gebruik](#ai-gebruik) hieronder
 
 ## AI-gebruik
+https://claude.ai/share/c1f23ea9-6892-4dd1-a4ef-f5ed055ac990
+Ik gebruikte AI om concepten te begrijpen waar ik moeilijkheden mee had vooral voor code te verbeteren en helpen als ik vast zat. Bijna alle code heb ik zelf geschreven en heb de suggesties van claude gebruikt waar nodig.
 
-<!-- TODO: eigen AI-log/toelichting hier toevoegen -->
 
