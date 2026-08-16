@@ -16,6 +16,9 @@ const viewGridBtn = document.querySelector('#view-grid');
 const viewTableBtn = document.querySelector('#view-table');
 const themeToggle = document.querySelector('#theme-toggle');
 const sentinel = document.querySelector('#sentinel');
+const resultCount = document.querySelector('#result-count');
+const favoritesOnlyCheckbox = document.querySelector('#favorites-only');
+const emptyState = document.querySelector('#empty-state');
 
 let allCharacters = [];
 let currentView = 'grid';
@@ -189,17 +192,29 @@ function applyFilters() {
   const status = statusFilter.value;
   const species = speciesFilter.value;
   const sortOrder = sortSelect.value;
+  const onlyFavorites = favoritesOnlyCheckbox.checked;
 
   const filtered = allCharacters.filter((character) => {
     const matchesSearch = character.name.toLowerCase().includes(searchTerm);
     const matchesStatus = status === '' || character.status.toLowerCase() === status;
     const matchesSpecies = species === '' || character.species === species;
-    return matchesSearch && matchesStatus && matchesSpecies;
+    const matchesFavorite = !onlyFavorites || favorites.includes(character.id);
+    return matchesSearch && matchesStatus && matchesSpecies && matchesFavorite;
   });
 
   const sorted = filtered.sort((a, b) =>
     sortOrder === 'name-desc' ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name)
   );
+
+  resultCount.textContent = `${sorted.length} resultaten`;
+
+  if (sorted.length === 0) {
+    emptyState.style.display = 'block';
+    container.style.display = 'none';
+  } else {
+    emptyState.style.display = 'none';
+    container.style.display = 'flex';
+  }
 
   renderCharacters(sorted);
 }
@@ -267,8 +282,8 @@ async function showCharacters() {
     const data = await getCharacters(currentPage);
     allCharacters = data.results;
     hasNextPage = data.info.next !== null;
-    renderCharacters(allCharacters);
     fillSpeciesFilter();
+    applyFilters();
   } catch (error) {
     container.textContent = '';
     const errorMessage = document.createElement('p');
@@ -316,6 +331,7 @@ searchInput.addEventListener('input', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
 speciesFilter.addEventListener('change', applyFilters);
 sortSelect.addEventListener('change', applyFilters);
+favoritesOnlyCheckbox.addEventListener('change', applyFilters);
 
 viewGridBtn.addEventListener('click', () => {
   currentView = 'grid';
